@@ -29,7 +29,7 @@ class ElectricElement:
         self.type = element_type
         self.id = id
         # FIXME: D or A type
-        self.port_code, self.port_name = self.build_port_name(port_name)
+        self.port_type, self.port_code = self.build_port_name(port_name)
 
     @staticmethod
     def build_port_name(name):
@@ -62,6 +62,15 @@ class ElectricElement:
 
     def read_value(self):
         return random.randint(1, 1000)
+
+    def to_dict(self):
+        return {
+            'type': self.type,
+            'id': self.id,
+            'port_type': self.port_type,
+            'port_code': self.port_code,
+            'value': self.read_value(),
+        }
 
 
 class Relay(ElectricElement):
