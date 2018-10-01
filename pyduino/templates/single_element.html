@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}All Info{% endblock %}
+{% block content %}
+<div>
+    <h1>{{ element.type }}</h1>
+    <li>{{ element.id }}</li>
+    <li>{{ element.port_type }}{{ element.port_code }}</li>
+    <li>{{ element.value }}</li>
+</div>
+{% endblock %}

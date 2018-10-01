@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}All Info{% endblock %}
+{% block content %}
+<div>
+    <h1>Sensors</h1>
+    <table style="width:40%">
+        <tr>
+            <th>Sensor id</th>
+            <th>Port</th>
+            <th>Value</th>
+        </tr>
+        {% for sensor in sensors %}
+            <tr>
+                <td>
+                    {{ sensor.id }}
+                </td>
+                <td>{{ sensor.port_type }}{{ sensor.port_code}}</td>
+                <td>{{ sensor.value }}</td>
+            </tr>
+        {%  endfor %}
+    </table>
+</div>
+<div>
+    <h1>Relays</h1>
+    <table style="width:40%">
+        <tr>
+            <th>Sensor id</th>
+            <th>Port</th>
+            <th>Value</th>
+        </tr>
+        {% for relay in relays %}
+            <tr>
+                <td>
+                    {{ relay.id }}
+                </td>
+                <td>{{ relay.port_type }}{{ relay.port_code}}</td>
+                <td>{{ relay.value }}</td>
+            </tr>
+        {%  endfor %}
+</div>
+{% endblock %}
