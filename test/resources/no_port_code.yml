@@ -1,0 +1,22 @@
+# board00
+-  boardId: 00
+   tty: AAA
+   sensors:
+     -  id: uimidity00
+        type: humidity
+        #ports: [D12, A82]
+        port: D12
+     -  id: humidity00
+        type: humidity
+        port: D
+   relays:
+     -  id: relay00
+        port: D53
+        default_status: on
+# board01
+-  boardId: 01
+   tty: AAB
+   sensors:
+     - id: huimidity00
+       type: humidity
+       port: A12
