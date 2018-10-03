@@ -134,7 +134,7 @@ class SetupConfig:
             board_item = Board(
                 id=board_id,
                 sensors=board['sensors'],
-                relays=board['sensors'],
+                relays=board.get('relays'),
             )
             self.boards[board_id] = board_item
 
