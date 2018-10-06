@@ -2,3 +2,5 @@ pyserial==3.4
 Flask==1.0.2
 PyYAML==3.13
 pytest==3.8.1
+influxdb==5.2.0
+pyFirmata==1.0.3
