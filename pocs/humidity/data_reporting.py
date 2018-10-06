@@ -2,13 +2,13 @@
 # -*- coding: UTF-8 -*-
 import datetime
 import argparse
+import sys
 
-import time
 from pyfirmata import Arduino, util
 from influxdb import InfluxDBClient
 
 # FIXME: this must should be set by arguments
-DATABASE = 'poc_humidity'
+TIME_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
 
 
 def get_arguments():
@@ -23,14 +23,15 @@ def get_arguments():
                         dest='analog_ports',
                         help='Should be a list of integers. P.e.: 3 5 8'
                         )
-    parser.add_argument('-s', '--sleep-seconds',
-                        type=int, required=False, default=1,
-                        dest='sleep_seconds',
-                        help='Number of seconds to wait. Default 1')
-    parser.add_argument('-i', '--influx_host',
+    parser.add_argument('-i', '--influx-host',
                         type=str, required=False, default=None,
                         dest='influxdb_host',
                         help='If specified, data will be send to influxdb')
+    parser.add_argument('-db', '--database-name',
+                        type=str, required=False, default='poc_humidity',
+                        dest='database',
+                        help='Influxdb database name. Default value will be'
+                             'poc_humidity')
     return parser.parse_args()
 
 
@@ -57,30 +58,32 @@ def main():
     client = None
     if args.influxdb_host:
         client = InfluxDBClient(args.influxdb_host, 8086,
-                                'root', 'root', DATABASE)
-        client.create_database(DATABASE)
+                                'root', 'root', args.database)
+        client.create_database(args.database)
 
-    while True:
-        print('{}'.format(datetime.datetime.now()))
-        points = []
-        for port in args.analog_ports:
-            port_read = board.analog[port].read()
-            print('Port {}: {}'.format(port, port_read))
-            if client:
-                points.append(
-                    dict(
-                        measurement='humidity_sensor',
-                        time=datetime.datetime.now().isoformat(),
-                        fields={'value': port_read},
-                        tags={'sensor_port': port}
-                    )
-                )
-        if client and points:
-            client.write_points(points)
-        print('====================')
-        # FIXME: parametrize
-        time.sleep(args.sleep_seconds)
+    points = []
+    for port in args.analog_ports:
+        port_read = board.analog[port].read()
+        print('Port {}: {}'.format(port, port_read))
+        if client:
+            time = datetime.datetime.utcnow().strftime(TIME_FORMAT)
+            port_name = 'A{}'.format(port)
+            point = dict(
+                measurement='humidity_sensor',
+                time=time,
+                fields={'value': port_read},
+                tags={'sensor_port': port_name}
+            )
+            print(point)
+            points.append(point)
+    if client and points:
+        client.write_points(points)
+    print('Finish')
 
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except:
+        sys.exit(1)
+    sys.exit(0)
