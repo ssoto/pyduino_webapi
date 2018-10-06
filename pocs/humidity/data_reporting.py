@@ -11,6 +11,11 @@ from influxdb import InfluxDBClient
 TIME_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
 
 
+def log(msg):
+    time = datetime.datetime.utcnow().strftime(TIME_FORMAT)
+    print('{} - {}'.format(time, msg))
+
+
 def get_arguments():
     parser = argparse.ArgumentParser(description='Process some integers.')
     parser.add_argument('-dev', '--arduino-device',
@@ -50,9 +55,9 @@ def initialize_arduino_reading(board,
 
 def main():
     args = get_arguments()
-    print('Initializing....')
+    log('Initializing....')
     board = Arduino(args.arduino_device)
-    print('Arduino connected to: {}'.format(args.arduino_device))
+    log('Arduino connected to: {}'.format(args.arduino_device))
     initialize_arduino_reading(board, args.analog_ports)
 
     client = None
@@ -64,7 +69,7 @@ def main():
     points = []
     for port in args.analog_ports:
         port_read = board.analog[port].read()
-        print('Port {}: {}'.format(port, port_read))
+        log('Port {}: {}'.format(port, port_read))
         if client:
             time = datetime.datetime.utcnow().strftime(TIME_FORMAT)
             port_name = 'A{}'.format(port)
@@ -74,11 +79,13 @@ def main():
                 fields={'value': port_read},
                 tags={'sensor_port': port_name}
             )
-            print(point)
+            log(point)
             points.append(point)
     if client and points:
         client.write_points(points)
-    print('Finish')
+    board.exit()
+    log('Connection with board has been closed')
+    log('Finish')
 
 
 if __name__ == '__main__':
